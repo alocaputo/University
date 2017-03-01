@@ -1,0 +1,72 @@
+(define segno         ;val: "-" ""
+  (lambda (n)         ;stringa e eventuale segno
+    (if (char=? (string-ref n 0) #\-)
+        #\-
+        #\+)))
+
+(define assoluto             ;val: stringa 
+  (lambda (n)                ;n: stringa e eventuale segno
+    (if (or (char=? (string-ref n 0) #\-) (char=? (string-ref n 0) #\+))
+        (substring n 1)
+        (substring n 0))
+    ))
+
+(define point                    ;val: intero         Stablisce la posizione della virgola
+  (lambda (n)                    ;n: stringa di 0, 1 e "."
+     (if (char=? (string-ref (assoluto n) 0) #\.)
+        0
+        (if (string=? (substring (assoluto n) 1) "")
+        (string-length (assoluto n))
+        (+ 1 (point(substring (assoluto n) 1)))
+        ))
+    ))
+
+(define intero ; Ricava la parte intera xxxx.yyyy -> xxxx
+  (lambda (n)
+    (substring (assoluto n) 0 (point n))
+    ))
+
+(define conv-int ;Coversione parte intera
+  (lambda (n)
+    (if (string=? n "")
+        0
+    (if (char=?(string-ref n 0) #\1) 
+         (+(expt 2 (-(string-length n)1)) (conv-int (substring n 1)))
+          (+ 0 (conv-int (substring n 1))))
+          )
+    ))
+
+(define ci     ;Converte solo la parte intera
+  (lambda (n)
+    (conv-int (intero n))
+    ))
+
+(define decimale ; Ricava la parte decimale xxxx.yyyy -> yyyy
+  (lambda (n)
+    (let ((na(assoluto n)))
+    (if (=(string-length na) (string-length (intero n))) "0" 
+          (substring na (+(point n)1))))
+    ))
+
+    
+(define conv-dec ;Coversione parte decimale
+  (lambda (n)
+    (if (string=? n "")
+        0
+    (if (char=?(string-ref n (-(string-length n)1)) #\1) 
+         (+(/ 1 (expt 2 (string-length n))) (conv-dec (substring n 0 (-(string-length n)1 ))))
+          (+ 0 (conv-dec (substring n 0 (-(string-length n)1 )))))
+          )
+    ))    
+
+(define cd ;Converte solo parte decimae
+  (lambda (n)
+    (conv-dec (decimale n))
+    ))
+
+(define bin-rep->number ; Conversione da binario a decimale
+  (lambda (n)           ; n: stringa
+    (if (char=? (segno n) #\-)
+        (* -1 (+ (ci n) (cd n)))
+    (+ (ci n) (cd n))
+    )))

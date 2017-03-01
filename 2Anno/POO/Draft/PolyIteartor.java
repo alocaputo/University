@@ -1,0 +1,186 @@
+import java.util.Objects;
+import java.util.Vector;
+import java.util.Iterator;
+/**
+ * This class provides an ADT for polynomials with integer
+ * not null coefficients and with non negative exponents: c_0+c_1*x+c_2*x^2+... .
+ * Poly is immutable, unbounded.
+ * The empty poly is 0=0*x^0.
+ */
+public class Poly {
+	/**
+	 * a record that represents a single term of the poly:
+	 * c * x^e
+	 */
+	private class PolynomialTerm implements Cloneable {
+		int coeff;
+		int exponent;
+		PolynomialTerm(int c, int e){
+			this.coeff=c;
+			this.exponent=e;
+		}
+		/**
+		 * Copy constructor
+		 * @param cpe: REQUIRE not null
+		 */
+		PolynomialTerm(PolynomialTerm ce){
+			ce=Objects.requireNonNull(ce);
+			this.coeff=ce.coeff;
+			this.exponent=ce.exponent;
+		}
+	}
+	/** INVARIANT terms = the list of terms;
+	 * there is no relation between index of the term with exponent.
+	 * There can be terms with c=0.
+	 */
+	private Vector<PolynomialTerm> terms;
+	/** @return: a new zero (empty) poly .
+1
+	 */
+	public Poly(){
+		terms = new Vector<PolynomialTerm>();
+	}
+	/** @param c: the coefficient
+		@param n: the exponent
+		@return: a new Poly c*x^n if c!=0; otherwise the zero Poly
+		@Throws NegativeExponentException when n<0.
+	 */
+	public Poly(int c, int n) 
+		//	throws NegativeExponentException 
+	{
+		//if (n<0){
+		//	throw new NegativeExponentException();
+		//}
+		terms = new Vector<PolynomialTerm>();
+		if (c!=0){
+			PolynomialTerm ce = new PolynomialTerm(c,n);
+			terms.addElement(ce);
+		}
+	}
+	/**
+	 * Copy constructor.
+	 * @param p: REQUIRE not null
+	 */
+	public Poly(Poly p){
+	}
+	/**
+	 * @param p: the poly to be added to this; REQUIRE not null.
+	 * @return a new poly that is this+p
+	 */
+	public Poly add(Poly p){
+		assert (this.terms != null );
+		int d = p.degree();
+		int c = p.coefficient(d);
+		PolynomialTerm ce = new PolynomialTerm(c,d);
+		this.terms.add(ce);	
+		return this;
+	}
+	/** @return the largest exponent in this with non zero coeff or 0 if this
+	 * is the zero poly
+	 */
+	public int degree(){
+		assert (this.terms!=null);
+		if (this.terms.isEmpty()){
+			return (0);
+		}
+		int highest = 0;
+		for (int i=0; i<this.terms.size(); i++){
+			PolynomialTerm cpe = this.terms.get(i);
+			if (cpe.exponent>highest){
+				highest = cpe.exponent;
+			}
+		}
+		return(highest);
+	}
+	/**
+	 * @param n: an exponent.
+	 * @return the coefficient of the term in this that has exponent n; possibly 0
+	 */
+	public int coefficient(int n){
+		assert (this.terms!=null);
+		Iterator<PolynomialTerm> it = this.terms.iterator();
+		while (it.hasNext()){
+			PolynomialTerm cpe = it.next();
+			if (cpe.exponent==n){
+				return(cpe.coeff);
+			}
+		}
+		return(0);
+	}
+	/** @return the poly -(this)
+	 */
+	public Poly minus(){
+		Poly p = new Poly(-1,0);
+		this.mul(p);
+		return p;
+	}
+	/** @param p: the poly to be multiplied to this; REQUIRE not null.
+		@return a new poly that is this*p
+	 */
+	public Poly mul(Poly p){
+		assert (this.terms != null );
+		int d = p.degree();
+		int c = p.coefficient(d);
+		int d2 = this.degree();
+		int c2 = this.coefficient(d2);
+		PolynomialTerm ce = new PolynomialTerm(c*c2,d+d2);
+		terms.clear();
+		terms.add(ce);	
+		return this;
+	}
+	public String toString(){
+		assert (this.terms!=null);
+		StringBuffer s = new StringBuffer();
+		Iterator<PolynomialTerm> it = this.terms.iterator();
+		while (it.hasNext()){
+			PolynomialTerm cpe = it.next();
+			s.append(String.format("+%d*x^%d", cpe.coeff,cpe.exponent));
+		}
+		return(s.toString());
+	}
+
+	public Iterator<PolynomialTerm> iterator(){
+		assert ( this.terms != null );
+		TermIterator result = new TermIterator (this);
+		return ((Iterator<PolynomialTerm>) result);
+	}
+//-----------------------------	
+	private class TermIterator implements Iterator<PolynomialTerm> {
+		private int current;
+		final private Vector<PolynomialTerm> terms;
+		
+		@SuppressWarnings
+		("unchecked")
+		TermIterator(Poly p){
+		Objects.requireNonNull(p);
+		this.terms = (Vector<PolynomialTerm>) p.terms.clone();
+		this.current = 0;
+		}
+		@Override
+		public boolean hasNext() {
+		return (this.current < this.terms.size());
+		}
+		@Override
+		//public PolynomialTerm next(){
+		public PolynomialTerm next(){	
+			//if ( this.current < this.terms.size()){  
+				PolynomialTerm res = this.terms.get((int)this.current);
+				this.current++;
+	            //return  new Poly(res.coeff,res.exponent);
+				//return terms.get(current++);
+				//Poly p = new Poly(res.coeff,res.exponent);
+				return res;
+				 
+	        //} else
+			//{
+				//throw new NoSuchElementException( "Went beyond the available values" );
+			//}
+			//return null;
+			
+		}
+		@Override
+		public void remove() {
+		throw new UnsupportedOperationException();
+		}
+		}
+}

@@ -1,0 +1,50 @@
+(define soggetto     ;val:stringa
+       (lambda(sog)   ;inf:stringa
+       (if(string=? (substring sog (-(string-length sog) 1)) "o")
+        (string-append "Il " sog)
+       (if(string=? (substring sog (-(string-length sog) 1)) "i")
+         (string-append "I " sog)
+       (if(string=? (substring sog (-(string-length sog) 1)) "e")
+         (string-append "Le " sog)
+       (if(string=? (substring sog (-(string-length sog) 1)) "a")
+         (string-append "La " sog)
+         "la parola non finsice per -o -i -e -a"))))))
+
+(define complemento     ;val:stringa
+       (lambda(ogg)   ;inf:stringa
+       (if(string=? (substring ogg (-(string-length ogg) 1)) "o")
+        (string-append "il " ogg)
+       (if(string=? (substring ogg (-(string-length ogg) 1)) "i")
+         (string-append "i " ogg)
+       (if(string=? (substring ogg (-(string-length ogg) 1)) "e")
+         (string-append "le " ogg)
+       (if(string=? (substring ogg (-(string-length ogg) 1)) "a")
+         (string-append "la " ogg)
+         "la parola non finsice per -o -i -e -a"))))))
+                     
+(define predicato
+  (lambda (s v)
+    (if (string=? (substring v  (-(string-length v) 2) (string-length v)) "re")
+        (if    (char=? (string-ref v (-(string-length v)3)) #\a)
+               (if 
+                (or (char=? (string-ref s (-(string-length s)1)) #\i) (char=? (string-ref s (-(string-length s)1)) #\e))
+               (string-append(substring v 0 (- (string-length v) 3)) "ano")
+               (string-append(substring v 0 (- (string-length v) 3)) "a"))
+               
+          (if  (char=? (string-ref v (-(string-length v)3)) #\e)
+               (if 
+                (or (char=? (string-ref s (-(string-length s)1)) #\i) (char=? (string-ref s (-(string-length s)1)) #\e))
+               (string-append(substring v 0 (- (string-length v) 3)) "ono")        
+               (string-append(substring v 0 (- (string-length v) 3)) "e"))
+               
+            (if (char=? (string-ref s (-(string-length s)1)) #\i)
+                (string-append(substring v 0 (- (string-length v) 3)) "ono")
+                (string-append(substring v 0 (- (string-length v) 3)) "e")
+                )))   
+        "")
+        ))
+
+
+(define frase
+  (lambda (nome verbo oggetto)
+    (string-append (soggetto nome) " " (string-append (predicato nome verbo) " " (complemento oggetto)))))

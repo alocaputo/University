@@ -1,0 +1,41 @@
+ (define new-round-table ; val: configurazione
+   (lambda (n) ; n: intero positivo
+     (lambda (x) (+ (remainder x n) 1))
+ ))
+
+
+ (define last-knight-in? ; val: booleano
+   (lambda (tab) ; tab: configurazione
+     (let ( (j (tab 0)) )
+       (= j (tab j) )
+      )
+ ))
+
+ (define knight-with-jug-in ; val: etichetta numerica del cavaliere con la brocca
+   (lambda (tab) ; tab: configurazione
+     (tab 0)
+ ))
+
+ (define after-next-exit-from ; val: configurazione
+   (lambda (tab) ; tab: configurazione
+     (let ( (j (tab 0)) )
+       (lambda (x)
+         (if (or (= x 0) (= x j))
+             (tab (tab j))
+             (tab x)
+       )) ; lambda
+ )))
+
+(define josephus                   ; val: etichetta [intero]
+  (lambda (n)                      ; n: intero positivo
+    (count (new-round-table n))
+    ))
+
+(define count                      ; val: etichetta
+  (lambda (tab)                    ; tab: configurazione
+    (if (last-knight-in? tab)
+        (knight-with-jug-in tab)
+        (count (after-next-exit-from tab))
+        )
+    ))
+

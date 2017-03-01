@@ -1,0 +1,83 @@
+(define segno         ;val: "-" ""
+  (lambda (n)         ;stringa e eventuale segno
+    (if (char=? (string-ref n 0) #\-)
+        #\-
+        #\+)))
+
+(define convint ;Coversione parte intera
+  (lambda (s n)
+    (let ((k (string-length s)))
+    (if (string=? n "")
+        0
+    (if (char=?(string-ref n 0) #\0) 
+        (+ 0 (convint s (substring n 1)))
+         (+(*(expt k (-(string-length n)1))(conversione (string-ref n 0) s)) (convint s (substring n 1)))
+          )
+          )
+    )))
+
+(define convdec ;Coversione parte decimale
+  (lambda (s n)
+    (let ((k (string-length s)))
+    (if (string=? n "")
+        0
+    (if (char=?(string-ref n (-(string-length n)1)) #\0) 
+        (+ 0 (convdec s (substring n 0 (-(string-length n)1 ))))
+         (+(*(/ 1 (expt k (string-length n)))(conversione (string-ref n (-(string-length n)1)) s)) (convdec s (substring n 0 (-(string-length n)1 ))))
+          )
+          )
+    )))
+
+(define point                    ;val: intero         Stablisce la posizione della virgola
+  (lambda (n)                    ;n: stringa di 0, 1 e "."
+     (if (char=? (string-ref (assoluto n) 0) #\.)
+        0
+        (if (string=? (substring (assoluto n) 1) "")
+        (string-length (assoluto n))
+        (+ 1 (point(substring (assoluto n) 1)))
+        ))
+    ))
+
+(define assoluto             ;val: stringa 
+  (lambda (n)                ;n: stringa e eventuale segno
+    (if (or (char=? (string-ref n 0) #\-) (char=? (string-ref n 0) #\+))
+        (substring n 1)
+        (substring n 0))
+    ))
+
+
+(define cd ;Conversione solo parte decimae
+  (lambda (s n)
+    (convdec s (decimale n))
+    ))
+
+(define decimale ; Ricava la parte decimale xxxx.yyyy -> yyyy
+  (lambda (n)
+    (let ((na(assoluto n)))
+    (if (=(string-length na) (string-length (intero n))) "0" 
+          (substring na (+(point n)1))))
+    ))
+
+(define intero ; Ricava la parte intera xxxx.yyyy -> xxxx
+  (lambda (n)
+    (substring (assoluto n) 0 (point n))
+    ))
+
+(define ci     ;Coversione solo parte intera
+  (lambda (s n)
+    (convint s (intero n))
+    ))
+
+(define conversione ;Trova valore
+  (lambda (c s)
+    (if (char=? c (string-ref s 0))
+        0
+        (+ 1 (conversione c (substring s 1))
+           ))))
+
+(define rep->number
+  (lambda (s n)
+    (if (char=? (segno n) #\-)
+        (* -1 (+ (ci s n) (cd s n)))
+    (+ (ci s n) (cd s n))
+    )))

@@ -1,0 +1,29 @@
+(define s2         ; val: intero (successivo)
+  (lambda (u v)    ; u, v: interi
+    (+ v 1)
+    ))
+
+(define H
+  (lambda (f g)
+    (lambda (m n)
+      (if (= n 0)
+          (f m)
+          (g m ((H f g) m (- n 1)))))))
+
+(define i
+  (lambda (n)
+    n))
+
+(define z
+  (lambda (n)
+    0))
+
+(define u
+  (lambda (n)
+    1))
+
+(define add (H i s2))
+
+(define mul (H z add))
+
+(define pow (H u mul))

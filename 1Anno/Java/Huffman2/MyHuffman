@@ -1,0 +1,274 @@
+
+import java.util.*;
+
+import huffman_toolkit.*;
+
+public class MyHuffman
+{
+
+ private static final int CHARS = InputTextFile.CHARS;
+   // 2.
+  // Albero binario di codifica dei caratteri
+  // freq: istogramma delle frequenze
+  
+  public static Node huffmanTree( int[] freq ) {
+  
+    PriorityQueue<Node> queue = new PriorityQueue<Node>();  // coda con priorita' di nodi
+    
+    for ( int c=0; c<CHARS; c=c+1 ) {                       // per ogni carattere utilizzato
+      if ( freq[c] > 0 ) {
+        Node n = new Node( (char) c, freq[c] );             // creazione del nodo corrispondente
+        queue.add( n );                                     // e inserimento nella coda
+    }}
+    while ( queue.size() > 1 ) {                            // finche' c'e' piu' di un nodo nella coda
+    
+      Node l = queue.peek();                                // rimozione dei due nodi di peso minimo...
+      queue.remove( l );
+      Node r = queue.peek();
+      queue.remove( r );
+      
+      Node n = new Node( l, r );                            // ...costruzione di un (sotto) albero
+      queue.add( n );                                       // e inserimento nella coda
+    }
+    return queue.peek();                                    // radice dell'albero di Huffman
+  }
+
+   // 3.
+  // Tabella di codifica dei caratteri:
+  // root: nodo radice dell'albero di Huffman
+  
+  public static String[] huffmanCodesTable( Node root ) {
+  
+    String[] codes = new String[ CHARS ];                   // tabella dei codici di Huffman
+    
+    fillTable( root, "", codes );                           // compilazione della tabella
+    
+    return codes;
+  }
+
+
+  // 4.
+  // Codifica lineare dell'albero di Huffman tramite visita ricorsiva
+  // n: nodo visitato
+  // Struttura:
+  // - una foglia e' codificata dal carattere che rappresenta
+  //   (i caratteri speciali '@' e '\' sono preceduti da '\')
+  // - un albero con piu' di un nodo e' codificato
+  //   linearizzando i sottoalberi sinistro e destro,
+  //   quindi giustapponendo il simbolo '@' e le stringhe ottenute
+  
+  public static String flattenTree( Node n ) {
+    
+    if ( n.isLeaf() ) {                                     // foglia: codifica del carattere
+      char c = n.character();
+      if ( (c == '\\') || (c == '@') ) {
+        return ( "\\" + c );                                // caratteri speciali: \, @
+      } else {
+        return ( "" + c );                                  // altri caratteri
+      }
+    } else {
+      return ( "@"                                          // @
+             + flattenTree( n.left() )                      // codifica lineare del sottoalbero sinistro
+             + flattenTree( n.right() )                     // codifica lineare del sottoalbero destro
+               );
+    }
+  }
+  
+
+    // Decodifica del carattere successivo
+  // root: nodo radice dell'albero di Huffman
+  // in:   documento compresso
+  
+  private static char decodeNextChar( Node root, InputTextFile in ) {
+  
+    Node n = root;                                          // percorso lungo l'albero di Huffman
+    
+    do {
+      if ( in.readBit() == 0 ) {
+        n = n.left();                                       // bit 0: figlio sinistro
+      } else {
+        n = n.right();                                      // bit 1: figlio destro
+      }
+    } while ( !n.isLeaf() );                                // fino al raggiungimento di una foglia
+    
+    return n.character();                                   // carattere individuato
+  }
+  
+    // Compilazione della tabella tramite visita ricorsiva dell'albero di Huffman
+  // n:     nodo visitato
+  // code:  codice binario del percorso dalla radice al nodo n
+  // codes: variabile di stato per registrare i codici dei caratteri
+  
+  private static void fillTable( Node n, String code, String[] codes ) {
+  
+    if ( n.isLeaf() ) {
+      codes[ n.character() ] = code;                        // nodo foglia: code = codice del carattere
+    } else {
+      fillTable( n.left(),  code+"0", codes );              // figlio sinistro: bit 0 nel codice
+      fillTable( n.right(), code+"1", codes );              // figlio destro:   bit 1 nel codice
+    }
+  }
+  
+  // 6.
+  // Ricostruzione dell'albero di Huffman dalla sua codifica lineare
+  // in: documento compresso
+  // Struttura:
+  // - una foglia e' rappresentata dal carattere corrispondente
+  // - un albero con piu' di un nodo e' rappresentato
+  //   dalla linearizzazione dei sottoalberi sinistro e destro,
+  //   precedute dal simbolo '@'
+  
+  public static Node restoreTree( InputTextFile in ) {
+  
+    char c = (char) in.readChar();                          // carattere dell'intestazione
+    
+    if ( c == '@' ) {                                       // '@' ?
+    
+      Node left  = restoreTree( in );                       // sottoalbero sinistro
+      
+      Node right = restoreTree( in );                       // sottoalbero destro
+      
+      return new Node( left, right );                       // nodo genitore
+    
+    } else {
+      if ( c == '\\' ) {
+        c = (char) in.readChar();                           // carattere speciale (skip)
+      }
+      return new Node( c, 0 );                              // foglia
+    }
+  }
+  
+
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////                  MIEI METODI        /////////////////////////////////////////////////////////
+ ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+   public static void myCompress( String src, String dst ) {
+    
+    // Scansione I : frequenze dei carattteri
+    Node root;
+    InputTextFile treeIn = new InputTextFile( "tree.txt" ); //file contenente la stringa rappresentativa dell'albero
+    if(treeIn.textAvailable()) // se nel file Ã¨ giÃ  presente un albero lo utilizza
+    {
+     root = restoreTree(treeIn);   
+   treeIn.close();
+    }
+    else //se non Ã¨ presente lo crea e lo inserisce nel file
+    {
+     treeIn.close();
+     int[] freq = tree2Array("stats.txt");                      // istogramma delle frequenze
+     root = huffmanTree( freq );                        // albero di Huffman
+      OutputTextFile treeOut = new OutputTextFile( "tree.txt" );         // salva la stringa che rappresenta l-albero nell-apposito file
+      treeOut.writeTextLine(flattenTree(root) );
+      treeOut.close();
+    }
+    int count = countChars(src);                              // numero complessivo di caratteri
+    String[] codes = huffmanCodesTable( root );             // tabella (array) dei codici
+    
+    // Scansione II : codifica di Huffman
+    
+    InputTextFile in = new InputTextFile( src );            // documento originale
+    
+    OutputTextFile out = new OutputTextFile( dst );         // documento compresso
+   
+    out.writeTextLine( "" + count );                        // intestazione del documento compresso
+    
+  
+    for ( int j=0; j<count; j=j+1 ) {                       // scansione: codifica dei caratteri
+    
+      char c = in.readChar();
+     // System.out.println(count);
+      out.writeCode( codes[c] );
+    }
+    in.close();
+    out.close();
+  }
+
+  public static int countChars(String src)
+  {
+    InputTextFile text = new InputTextFile(src);  
+    int count=0;
+    while(text.textAvailable()){
+      text.readChar();
+      count++;
+    }
+    return count;
+  }
+
+  ///////////////genera un array di frequenze a partire da un file contente la statistica di frequenza///////////////
+  public static int[] tree2Array(String in)
+  {
+    InputTextFile tree = new InputTextFile(in);
+    int[] array = new int[128];
+    int i=0,num;
+    double temp;
+    while(tree.textAvailable())
+    {
+      temp=Double.parseDouble(tree.readTextLine())*1000;
+      num=(int) temp;
+      array[i] = num;
+      //System.out.println(i+" "+array[i]);
+      i++;
+    }
+    tree.close();
+    return array;
+  }
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  //////////metodo di debug////////////////////////////////////
+    public static void printArray( String output, int[] array)
+  {
+    OutputTextFile out = new OutputTextFile(output);
+    for(int i=0; i<128; i++)
+    {
+     // System.out.println(array[i]);
+      out.writeTextLine(i+" "+array[i]);
+    } 
+    out.close();
+  }
+////////////////////////////////////////////////////////////
+
+
+ public static void myDecompress( String src, String dst ) {
+  InputTextFile tree = new InputTextFile( "tree.txt" );            // file contenente la stringa che rappresenta l-albero
+  Node root = restoreTree(tree);   
+  tree.close();
+    InputTextFile in = new InputTextFile( src );            // documento compresso
+    
+     
+    int count = Integer.parseInt( in.readTextLine() );      // decodifica dell'intestazione
+
+   
+    OutputTextFile out = new OutputTextFile( dst );         // documento ripristinato
+    
+    for ( int j=0; j<count; j=j+1 ) {                       // scansione: decodifica dei caratteri
+      
+      char c = decodeNextChar( root, in );
+      out.writeChar( c );
+    }
+    in.close();
+    out.close();
+  }
+
+    public static void main( String[] args ) {
+
+    System.out.println( "huffman coding:" );
+    
+    if ( args[0].equals("compress") ) {
+    
+      System.out.println( "compressing..." );
+     myCompress( args[1], args[2] );
+    
+    } else if ( args[0].equals("decompress") ) {
+    
+      System.out.println( "decompressing..." );
+      myDecompress( args[1], args[2] );
+    
+    } else {
+      System.out.println( "no operation specified: 1st parameter should be either 'compress' or 'decompress'" );
+    }
+    System.out.println( "done." );
+  }
+
+}

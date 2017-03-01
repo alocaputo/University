@@ -1,0 +1,184 @@
+public class irpef{
+
+/*
+* Questo file contiene il codice Scheme che risolve
+* alcuni degli esercizi svolti in classe - 14/10/03
+* Ultimo aggiornamento: 23/10/08
+
+
+* Calcolo dell'IRPEF sulla base delle istruzioni Unico2008.
+*
+* Analisi ricorsiva del problema, che coglie piu' precisamente
+* il criterio adottato per determinare l'imposta.
+
+
+* -----  Sezione I:  Logica del calcolo dell'IRPEF  -----
+*
+* (Indipendente dai parametri e stabile nel tempo)
+
+* Astrazione procedurale: modalita' di calcolo dell'IRPEF.
+* Logica di calcolo indipendente sia dal numero degli scaglioni
+* che dai relativi parametri.
+
+
+* Calcolo dell'imposta sul reddito delle persone fisiche (IRPEF):
+* valore:          reale
+* argomenti
+* imponibile:      intero non negativo
+* (Nella dichiarazione gli importi sono arrotondati all'intero piu' vicino)
+
+(define irpef           ; imponibile >= 0
+  (lambda (imponibile)
+    (imposta imponibile (scaglione imponibile))
+    ))
+
+
+* Calcolo dell'imposta, noto lo scaglione del reddito (indice scaglione)
+* valore:          reale
+* argomenti
+* imponibile:      intero
+* indice:          [1, ultimo-scaglione]
+
+(define imposta                ; imponibile >= 0
+  (lambda (imponibile indice)  ; indice = 1, 2, ..., ultimo-scaglione
+    (if (= indice 1)
+        (* (aliquota 1) imponibile)
+        (+ (imposta (soglia-inf indice) (- indice 1))
+           (* (aliquota indice) (- imponibile (soglia-inf indice))))
+        )
+    ))
+
+
+* Determinazione dell'indice dello scaglione
+* valore:          [1, ultimo-scaglione]
+* argomenti
+* reddito:         intero
+
+(define scaglione    ; reddito >= 0
+  (lambda (reddito)
+    (localizza-da ultimo-scaglione reddito)
+    ))
+
+(define localizza-da        ; reddito >= 0, indice <= ultimo-scaglione
+  (lambda (indice reddito)  ; reddito di scaglione <= indice
+    (if (>= reddito (soglia-inf indice))
+        indice
+        (localizza-da (- indice 1) reddito)
+        )
+    ))
+
+
+* Aliquote
+
+(define aliquota
+  (lambda (indice)
+    (list-ref aliquote (- indice 1))
+    ))
+
+* Soglie fra scaglioni di reddito
+
+(define soglia-inf
+  (lambda (indice)
+    (list-ref soglie (- indice 1))
+    ))
+
+
+* -----  Sezione II:  Base di dati  -----
+*
+* (Soggetta alle delibere ministeriali)
+
+* Parametri contingenti relativi agli scaglioni
+* (tabelle ministeriali).
+
+
+* Aliquote
+
+(define aliquote
+  '(0.23 0.27 0.38 0.41 0.43)
+  )
+
+* Accesso indicizzato a un array - equivalente in java, C, C++:
+*
+*   float aliquota[] = { 0.23, 0.27, 0.38, 0.41, 0.43 };
+
+
+* Soglie fra scaglioni
+
+(define soglie
+  '(0 15000 28000 55000 75000)
+  )
+
+* Simula l'accesso indicizzato a un array - equivalente in java, C, C++:
+*
+*   float aliquota[] = { 0, 15000, 28000, 55000, 75000 };
+
+
+* Numero di scaglioni
+
+(define ultimo-scaglione (length aliquote))
+
+
+* Esercizio: I parametri riportati in questo esempio si riferiscono alla
+* dichiarazione "Unico"2008". Aggiorna opportunamente i dati numerici in
+* conformita' con le istruzioni di "Unico2002", "Unico2003", "Unico2004"
+* e "Unico2006" (vedi appunti).
+*/
+
+//MAIN
+  
+  public static double irpef2( int imponibile){ //imponibile >=0
+     return imposta( imponibile, scaglione(imponibile)); 
+  }
+  
+  
+//IMPOSTA
+  
+  public static double imposta( double imponibile, int indice){  // imponibile >= 0, indice = 1, 2, ..., ultimo-scaglione
+  if ( indice == 1 ){
+    return aliquota(1) * imponibile;
+  }else{
+      return imposta(soglia_inf( indice), ( indice - 1 )) + aliquota(indice) * ( imponibile - soglia_inf( indice));
+    }
+}
+
+//SCAGLIONE
+      
+public static int scaglione ( int reddito){ // reddito >= 0
+  return  localizza_da( ultimo_scaglione, reddito);
+} 
+
+public static int localizza_da( int indice, int reddito){ // reddito >= 0, indice <= ultimo-scaglione, reddito di scaglione <= indice
+  if ( reddito >= soglia_inf(indice)){
+    return indice;
+  }else{
+  return localizza_da (( indice - 1), reddito);
+  }
+}
+
+//ALIQUOTA
+
+public static double aliquota( int indice){
+  return aliquote [indice - 1];
+}
+  
+//SOGLIE
+  
+public static double soglia_inf( int indice ){
+  return soglie [indice - 1];
+}
+
+//SEZIONE DATI---------------------------------------------------------------------------------------------------------
+   
+//ALIQUOTE
+
+public static final double aliquote[] = new double[]{0.23, 0.27, 0.38, 0.41, 0.43};
+ 
+//SOGLIE
+
+public static final double soglie[] =  new double[]{0, 15000, 28000, 55000, 75000};
+
+//SCAGLIONI
+
+public static final int ultimo_scaglione = aliquote.length;
+
+}

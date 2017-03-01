@@ -1,0 +1,32 @@
+(set-tessellation-shift-step!)
+
+(define L
+  (lambda (n)
+    (cond ((= n 1) L-tile)
+          ((= n 2) (glue-tiles (shift-down (quarter-turn-left L-tile) 2)
+                    (glue-tiles(glue-tiles L-tile (shift-right (quarter-turn-right L-tile) 2) )
+                     (shift-right (shift-down L-tile 1) 1))))
+          (else (glue-tiles(shift-down (quarter-turn-left (L(/ n 2)))n) 
+                 (glue-tiles (glue-tiles (L(/ n 2))(shift-right (quarter-turn-right (L(/ n 2)))n))
+                  (shift-right(shift-down (L(/ n 2)) (/ n 2)) (/ n 2))))))
+)) 
+
+
+(define S-tessellation
+	(lambda (n i j)
+		(let ( (num (quotient n 2)) )
+			(cond
+				((and (= n 2) (= i 1) (= j 1)) L-tile)
+				((and (= n 2) (= i 2) (= j 1)) (quarter-turn-right L-tile))
+				((and (= n 2) (= i i) (= j 2)) (quarter-turn-left L-tile))
+				((and (= n 2) (= i 2) (= j 2))(half-turn L-tile))
+                                
+				((and (> i num) (<= j num))(glue-tiles (quarter-turn-right (L num))
+                                                            (shift-down (S-tessellation num (- i num) j)num)))
+				((and (<= i num) (> j num))(glue-tiles (quarter-turn-left (L num))
+                                                            (shift-right (S-tessellation num i (- j num)) num)))
+                                ((and (> i num) (> j num))(glue-tiles (half-turn (L num))
+                                                           (S-tessellation num (- i num) (- j num))))
+				(else (glue-tiles (L num)(shift-right
+                                        (shift-down(S-tessellation num i j) num) num)))))
+	))

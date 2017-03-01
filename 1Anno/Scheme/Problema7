@@ -1,0 +1,61 @@
+(define f
+  (lambda (n) ; n: intero non negativo (≥ 0)
+    (if (= n 0)
+        1
+        (/ 1 (+ 1 (f (- n 1)))) 
+        )))
+
+(define ft
+  (lambda (n x) ;n: intero non negativo (≥ 0), x: 1
+    (if (= n 0)
+        x
+        (ft (- n 1)(/ 1 (+ 1 x)))
+        )))
+
+
+(define g
+  (lambda (n k) ; n, k: interi non negativi (≥ 0)
+    (if (= k 0)
+        1
+        (quotient (* n (g (- n 1) (- k 1))) k)
+        )))
+
+
+(define gt
+  (lambda(n k x) ; n, k: interi non negativi (≥ 0), x: 1
+    (if (= k 0)
+        x
+        (gt (- n 1)(- k 1)(/ (* x n) k))
+        )
+    ))
+
+(define h
+  (lambda (n) ; n: intero positivo (> 0)
+    (if (= n 1)
+        1
+        (+ (* 2 (h (- n 1))) n)
+        )))
+
+
+(define ht
+  (lambda (n x y) ; n: intero positivo (> 0) , x: 0, y: 1
+    (if (= n 0)
+        x
+        (ht (- n 1) (+(* y n)x) (* y 2))
+        )
+    ))
+
+(define t
+  (lambda (n) ; n: intero positivo (> 0)
+    (if (= n 1)
+        1
+        (+ (* 2 (t (quotient n 2))) n)
+        )))
+
+(define tt
+  (lambda (n x y) ;n: intero positivo (> 0) , x: 0, y: 1
+    (if (= n 0)
+        x
+        (tt (quotient n 2) (+ x (* n y)) (* y 2))
+        )
+    ))

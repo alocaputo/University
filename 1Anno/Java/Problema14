@@ -1,0 +1,99 @@
+public class Problema14 {
+  
+//Scheme
+/*  
+ 
+ (define stirling ; valore: intero
+  (lambda (n k) ; n, k > 0 interi, k in [1,n]
+   (if (or (= k 1) (= k n))
+    1
+   (+ (stirling (- n 1) (- k 1))
+       (* k (stirling (- n 1) k)))
+   )
+ ))
+ 
+ */
+  public static final int UNKNOWN=-1;  
+//Traduzione in Java
+  
+  public static int stirling( int n, int k ){
+    if((k==1)||(k==n)){
+      return 1;
+    }else{
+      return stirling(n-1,k-1) + (k * stirling(n-1,k));
+    }
+  }
+  
+//Memoization
+  
+ public static long stirlingMem( int n, int k ) {
+    long[][] h = new long[n+1][k+1];
+    for ( int x=0; x<=n; x=x+1 ) {
+      for ( int y=0; y<=k; y=y+1 ) {
+        h[x][y] = UNKNOWN;
+      }
+    }
+    return stirlingRec (n, k, h);
+  }
+  
+  //Recursive
+  
+  public static long stirlingRec( int n, int k, long[][] value ){
+    if(value[n][k] == UNKNOWN ){
+      if(( k == 1 ) || ( k == n )){
+        value[n][k] = 1;
+      }else{
+        value[n][k] = stirlingRec( n-1, k-1, value ) + ( k * stirlingRec( n-1 ,k ,value ));
+      }}
+    return value[n][k];
+  }
+  
+  //Visualizzazioni
+  
+  public static String visualizzazione( long h[][], int n, int k ) {
+      String s = "";
+      for (int i=1; i<=n; i=i+1) {
+        s = s + "\n";        
+        for (int j=1; j<=k; j=j+1) {
+          if (h[i][j] == UNKNOWN) {
+            s = s + "U ";
+          } else {
+            s = s + "C ";
+          }
+        }
+      }
+      return s;
+    }
+  
+   public static String stirlingV( int n, int k ) { 
+    int x=0, y=0;
+    long[][] h = new long[n+1][k+1];
+    for ( x=0; x<=n; x=x+1 ) {
+      for ( y=0; y<=k; y=y+1 ) {
+        h[x][y] = UNKNOWN;
+      }
+    }
+    long st = stirlingRec (n, k, h);
+    return visualizzazione(h, n ,k);
+    }
+   
+   //Bottom Up
+   
+     public static long stirlingBU( int n, int k ) {
+    long[][] h = new long [n+1][k+1];
+     for ( int v=1; v<=n; v=v+1 ) {
+       h[v][1] = 1;
+     }
+     for ( int u=1; u<=k; u=u+1 ) {
+       h[u][u] = 1;
+     }
+     for ( int u=3; u<=n; u=u+1 ) {
+       for ( int v=2; v<=k; v=v+1 ) {
+         h[u][v] = h[u-1][v-1] + (v * h[u-1][v]);
+       }
+     }
+     return h[n][k];
+  }
+}//Class
+  
+  

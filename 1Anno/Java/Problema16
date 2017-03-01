@@ -1,0 +1,91 @@
+public class DistributoreAutomatico {
+  
+  private final int costo;
+  private int caffe;
+  private final int[] val;
+  private int[] quant;
+  private int credito;
+  
+   public DistributoreAutomatico( int c ) {
+     costo = c;
+     caffe = 0;
+     val = new int[]{5,10,20,50,100,200};
+     quant = new int[]{0,0,0,0,0,0};
+   }
+   
+   public void caricaCaffe( int k ) {
+     caffe = caffe + k;
+   }
+   
+   public void caricaMonete( int n, int v ) {
+     int k = indice(v);
+     quant[k] = quant[k] + n;
+   }
+   
+   private int indice( int v ) {
+     int k = 0;
+     while(val[k]<v) {
+       k = k + 1;
+     }
+     return k;
+   }
+   
+   public void inserisciMoneta ( int v ) {
+    int k = indice(v);
+    quant[k] = quant[k] + 1;
+    credito = credito + v;
+  }
+   
+   public void richiediCaffe()  {
+     if((credito >= costo)&&(caffe > 0)&&(restoSufficiente())) {
+       caffe = caffe - 1;
+       credito = credito - costo;
+     }
+   }
+  
+   public boolean caffeEsaurito() {
+     return (caffe == 0);
+   }
+   
+   public String leggiStato() {
+     if (caffe == 0) {
+       return "caffe' esaurito";
+     }else if (credito == 0) {
+       return "in funzione";
+     }else if (!restoSufficiente()) {
+       return "resto non disponibile per " + credito + " cent";
+     }else {
+       return "credito: " + credito + " cent";
+     }}
+   
+   private boolean restoSufficiente() {
+     int v = credito - costo;
+     int i=5;
+     while((i>=0)&&(v>0)) {
+       int k = v/val[i];
+       if(k <= quant[i]) {
+         v = v - (k * val[i]);
+       }else{
+         v = v - (quant[i] * val[i]);
+       }
+       i = i - 1;
+     }
+     return (v == 0);
+   }
+   
+   public void richiediResto() {
+    int i = 5;
+    while ((i>=0) && (credito >0)) {
+      int k = credito/val[i];
+      if (k <= quant[i]) {
+        credito = credito - (k * val[i]);
+        quant[i] = quant[i] - k;
+      } else {
+        credito = credito - (quant[i] * val[i]);
+        quant[i] = 0;
+      }
+      i = i-1;
+    }
+  }
+
+}//Class

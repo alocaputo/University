@@ -1,0 +1,28 @@
+(define codice-cesare          ; val: procedura
+  (lambda (rot)                ; rot: intero
+    (lambda (c)                ; c: lettera maiuscola,
+    (let ((n 0))
+    (t-code c n rot)
+    ))))
+      
+(define t-code                       ; val: carattere
+  (lambda (c n rot)                  ; c: carattere, n: contatore, rot: intero 
+    (let ((s "ABCDEFGHILMNOPQRSTVX"))
+    (if (= (char->integer c) 32)     ; space
+        (integer->char 32)
+    (if (char=? c (string-ref s n))
+        (if (> n 16)
+            (string-ref s (- (+ n rot) 20)) ; riparte dall'inizo
+            (string-ref s (+ n  rot))
+            )
+        (t-code c (+ n 1) rot)
+    )))))
+
+(define critt          ; val: stringa
+  (lambda (msg reg)    ; msg: stringa, reg: procedura [car->car]
+    (if (string=? msg "")
+        ""
+        (string-append 
+              (string (reg (string-ref msg 0)))
+              (critt (substring msg 1) reg)))
+        ))

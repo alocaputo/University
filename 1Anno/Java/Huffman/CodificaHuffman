@@ -1,0 +1,136 @@
+import java.util.*;
+import huffman_toolkit.*;
+
+public class CodificaHuffman {
+
+  private static final int CHARS = InputTextFile.CHARS;
+
+// istogramma delle frequenze(charHistogram)
+  public static int[] charHistogram( String src ) {
+  
+    InputTextFile in = new InputTextFile( src );
+    int[] freq = new int[ CHARS ];                          // istogramma delle frequenze dei caratteri
+    
+    for ( int c=0; c<CHARS; c=c+1 ) {                       // inizializzazione istogramma
+      freq[c] = 0;
+    }
+                       
+    while ( in.textAvailable() ) {                          // scansione: frequenze dei caratteri
+      
+      int c = in.readChar();                                // (ulteriore) occorrenza di c
+      freq[c] = freq[c] + 1;
+    }
+    in.close();
+     
+    return freq;
+  }
+  
+// Albero binario di codifica dei caratteri
+// freq: istogramma delle frequenze
+  
+  public static Node huffmanTree( int[] freq ) {
+    
+    PriorityQueue<Node> queue = new PriorityQueue<Node>();  // coda con priorita' di nodi
+    
+    for ( int c=0; c<CHARS; c=c+1 ) {                       // per ogni carattere utilizzato
+      if ( freq[c] > 0 ) {
+        Node n = new Node( (char) c, freq[c] );             // creazione del nodo corrispondente
+        queue.add( n );                                     // e inserimento nella coda
+      }}
+    while ( queue.size() > 1 ) {                            // finche' c'e' piu' di un nodo nella coda
+    
+      Node l = queue.peek();                                // rimozione dei due nodi di peso minimo...
+      queue.remove( l );
+      Node r = queue.peek();
+      queue.remove( r );
+      
+      Node n = new Node( l, r );                            // ...costruzione di un (sotto) albero
+      queue.add( n );                                       // e inserimento nella coda
+    }
+    return queue.peek();                                    // radice dell'albero di Huffman
+  }
+  
+// Tabella di codifica dei caratteri:
+// root: nodo radice dell'albero di Huffman
+  
+  public static String[] huffmanCodesTable( Node root ) {
+  
+    String[] codes = new String[ CHARS ];                   // tabella dei codici di Huffman
+    
+    fillTable( root, "", codes );                           // compilazione della tabella
+    
+    return codes;
+  }
+  
+  // Compilazione della tabella tramite visita ricorsiva dell'albero di Huffman
+  // n:     nodo visitato
+  // code:  codice binario del percorso dalla radice al nodo n
+  // codes: variabile di stato per registrare i codici dei caratteri
+  
+  private static void fillTable( Node n, String code, String[] codes ) {
+  
+    if ( n.isLeaf() ) {
+      codes[ n.character() ] = code;                        // nodo foglia: code = codice del carattere
+    } else {
+      fillTable( n.left(),  code+"0", codes );              // figlio sinistro: bit 0 nel codice
+      fillTable( n.right(), code+"1", codes );              // figlio destro:   bit 1 nel codice
+    }
+  }
+  
+  
+  public static void magic( String src, String dst ){
+    
+    int[] freq = CodificaHuffman.charHistogram(src);
+    Node root = CodificaHuffman.huffmanTree(freq);
+    CodificaHuffman.huffmanCodesTable(root);
+    String[] tab = CodificaHuffman.huffmanCodesTable(root);
+    int i = 0;
+    InputTextFile in = new InputTextFile( src );
+    OutputTextFile out = new OutputTextFile( dst );
+    String c;
+    
+  //  while( i<CHARS ){
+      
+
+      
+      for( i=0;i<CHARS;i++){
+        char ca = (char) i;
+        if ((char)i=='\n') c = "\\n";
+        else if((char)i==0) c = "NUL";
+        else if((char)i=='\r') c = "\\r";
+        
+        else if((char)i=='\t') c = "\\t";
+        else if((char)i=='\f') c = "\\f";
+        else if((char)i==' ') c = "SPC";
+        else c = "" + (char)i;
+        if( tab[ca] != null ){
+          String w = tab[ca];
+          int h = w.length();
+          out.writeTextLine( i + " \t" + c + "\t" +  freq[ca] + "\t" +  h  +  "\t" + tab[ca]);
+        }else{
+        
+        }  
+      }
+      
+    in.close();
+    out.close();
+  
+  }
+  
+  //Random
+  
+      public static void pro(String dst) {
+   Random rand = new Random(); 
+    OutputTextFile out = new OutputTextFile( dst );
+    for(int y=0;y<20;y++){
+    for( int i=0;i<2000;i++){
+      double k = rand.nextInt(127)+1;
+      char z = (char) k ;
+      out.writeChar( z );
+    }
+    out.writeTextLine("");}
+    
+    out.close();
+  }
+} // class CodificaHuffman
+    

@@ -1,0 +1,46 @@
+public class Problema13{
+ 
+//GreaterCommonDivisor
+  
+/*  (define gcd ; valore: intero
+ *    (lambda (x y) ; x, y > 0 interi
+ *       (cond ((= x y) x)
+ *          ((< x y) (gcd x (- y x)))
+ *         (else (gcd (- x y) y))
+ *       )))     
+ */
+  
+  public static int gdc( int x, int y ){
+    if ( x == y ){
+      return x;
+    }else{
+      if ( x < y ){
+        return  gdc( x , y-x );
+      }else{
+        return gdc( x-y , y);
+      }
+    }
+  }
+  
+// Moltiplicazione
+  
+/*  (define mul ; valore: intero
+ *     (lambda (m n) ; m, n: interi non negativi
+ *        (cond ((= n 0) 0)
+ *           ((even? n) (mul (* 2 m) (quotient n 2)) )
+ *          (else (+ (mul (* 2 m) (quotient n 2)) m))
+ *       )))
+ */
+  
+  public static int mul( int m, int n){  // m,n >= 0
+    if( n == 0 ){
+      return 0;
+    }else{
+      if( n%2 == 0 ){
+        return mul( 2*m , n/2);
+      }else{
+        return mul( 2*m , n/2) + m;
+      }
+    }
+  }
+}   

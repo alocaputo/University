@@ -1,0 +1,29 @@
+;Parte A
+
+(define primes1                ; val: lista di primi
+  (lambda (x n)               ; x: intero > 1, intero positivo >=2
+    (if (= x 1)
+        '()
+        (if (= (remainder x n) 0)
+            (cons n (primes1 (quotient x n) n))
+            (primes1 x (+ n 1))))))
+
+(define prime-factors       ; val: lista di primi
+  (lambda (x)               ; x: intero > 1
+    (primes1 x 2)))
+
+;Parte B -----------------------------------------------------------------------------------------------------------
+
+(define primes2
+  (lambda (x n p)               ; x: intero > 1, intero positivo >=2, p: ultimo primo in lista
+    (if (= x 1)
+        '()
+        (if (= (remainder x n) 0)
+            (if (= n p)
+                (primes2 (quotient x n) n p)
+                (cons n (primes2 (quotient x n) n n)))
+            (primes2 x (+ n 1) p)))))
+
+(define short-prime-factors           ; val: lista di primi non ripetuti
+  (lambda (x)                         ; x: intero > 1
+    (primes2 x 2 1)))

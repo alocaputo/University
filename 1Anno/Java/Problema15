@@ -1,0 +1,99 @@
+public class MyLCS {
+
+//Longer (la list più lunga)
+  private static StringList longer( StringList u, StringList v ) {
+    
+    int m = car(u).length();
+    int n = car(v).length();
+    
+    if ( m < n ) {
+      return v;
+    } else if ( m > n ) {
+      return u;
+    } else {
+      return unisci(u,v);
+    }
+  }
+  
+  private static StringList unisci (StringList u, StringList v) { // unisce le due liste eliminando i doppioni
+    while(!isEmpty(u)) {
+      v = cons(car(u), v);
+      u = cdr(u);
+    }
+    while(!isEmpty(v)) {
+      StringList doppio = cdr(v);
+      String primo = car(v);
+      Boolean flag = false;   // se vero, la stringa è un doppione 
+      while (!isEmpty(doppio)) {
+        if (primo.equals(car(doppio))) {
+          flag = true;
+        }
+        doppio = cdr(doppio);
+      }
+     if (!flag) u = cons(primo, u);
+     v = cdr(v);
+    }    
+    return u;
+   }
+  
+  private static StringList aggiungi (char c, StringList l) { //aggiunge un carattere a ogni elemento della lista
+    StringList u = StringList.NULL;
+    while (!isEmpty(l)) {
+    u = cons(c + car(l), u);
+    l = cdr(l);
+    }
+
+    return u; 
+  }
+  
+  // Versione che applica la tecnica di memoization:
+  
+  public static StringList allLcs( String u, String v ) {
+  
+    int m = u.length();
+    int n = v.length();
+    
+    StringList[][] llcsDb = new StringList[ m+1 ][ n+1 ];
+    
+    for ( int i=0; i<=m; i=i+1 ) {
+      for ( int j=0; j<=n; j=j+1 ) {
+        llcsDb[i][j] = null;
+    }}
+    return lcsRec( u, v, llcsDb );
+  }
+  
+  private static StringList lcsRec( String u, String v, StringList[][] llcsDb ) {
+  
+    int i = u.length();
+    int j = v.length();
+    
+    if ( llcsDb[i][j] == null ) {
+      if ( u.equals("") || v.equals("") ) {
+        llcsDb[i][j] = cons("",StringList.NULL);
+      } else if ( u.charAt(0) == v.charAt(0) ) {
+        llcsDb[i][j] = aggiungi(u.charAt(0), lcsRec( u.substring(1), v.substring(1), llcsDb));
+      } else {
+        llcsDb[i][j] = longer( lcsRec(u.substring(1),v,llcsDb),
+                               lcsRec(u,v.substring(1),llcsDb) );
+    }}
+    return llcsDb[i][j];
+  }
+  
+  public static StringList cons(String c, StringList lista) {
+  return StringList.listCons(c, lista);
+ }
+ 
+ public static String car(StringList lista) {
+  return StringList.listCar(lista);
+ }
+ 
+ public static StringList cdr(StringList lista) {
+  return StringList.listCdr(lista);
+ }
+ 
+ public static Boolean isEmpty(StringList lista) {
+  return StringList.listNull(lista);
+ } 
+}
+  
+  
