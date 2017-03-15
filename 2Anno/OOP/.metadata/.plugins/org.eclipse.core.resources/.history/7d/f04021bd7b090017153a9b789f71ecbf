@@ -1,0 +1,20 @@
+
+public class Palindrome {
+
+	/* isPalindrome tell if a string in palindrome
+	 * @param str the string to be checked
+	 * @return true if is palindrome, false else
+	 */
+
+	public static boolean isPalindrome(String str){
+		StringBuilder str1 = new StringBuilder(str);
+		str1.reverse();
+		String str2 = str1.toString();
+		return str.equals(str1) ? true : false;
+	}
+	
+	public static void main(String[] args) {
+		System.out.println(isPalindrome("anna"));
+	}
+
+}
