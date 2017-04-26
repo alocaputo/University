@@ -1,0 +1,9 @@
+
+public class PolyMain {
+
+	public static void main(String[] args) {
+		Poly p = new Poly();
+		
+	}
+
+}

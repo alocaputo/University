@@ -1,0 +1,31 @@
+import java.util.Iterator;
+
+public class PolyMain {
+
+	public static void main(String[] args) throws NegativeExponentException {
+		Poly p1 = new Poly(1,4); //+1*x^4
+		Poly p2 = new Poly(2,2); //+2*x^2
+		Poly p3 = new Poly(2,2); //+2*x^2
+		Poly p4 = new Poly(2,5); //+2*x^5
+
+		Poly p12 = p1.add(p2); //+1*x^4+2*x^2
+		Poly p122 = p1.add(p2); //+1*x^4+2*x^2
+		Poly p13 = p12.add(p3); //+1*x^4+4*x^2
+		
+		Poly s12 = p1.minus(p2);
+		
+		Poly m12 = p12.mul(p13); //+4*x^4+4*x^6
+		Poly m14 = p1.mul(p4);
+		String s = s12.toString();
+
+		//System.out.println(s);
+		
+		Iterator<Poly> it = p12.termIterator();
+		((Object) it).test();
+		while(it.hasNext()){
+			//Poly p = it.next();
+			//System.out.println(p.toString());
+		}
+	}
+
+}

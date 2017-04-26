@@ -1,0 +1,12 @@
+
+public class PolyMain {
+
+	public static void main(String[] args) throws NegativeExponentException {
+		Poly p1 = new Poly(1,2);
+		Poly p2 = new Poly(2,3);
+		p1.add(p2);
+		String s = p1.toString();
+		System.out.println(s);
+	}
+
+}

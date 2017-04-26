@@ -2,7 +2,7 @@
 public class Palindrome {
 
 	/* isPalindrome tell if a string in palindrome
-	 * @param str1 the string to be checked
+	 * @param str1 the string to be checked, REQUIRE has to be not null
 	 * @return true if is palindrome, false else
 	 */
 
